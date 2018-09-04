@@ -1,3 +1,14 @@
+.heading {
+    font-size: 28px;
+}
+
+.title {
+    font-size: 24px;
+}
+
+.sub-title{
+    font-size: 16px;
+}
 
 .card{
     padding: 12px;
@@ -25,4 +36,25 @@
 
 .introduction{
     margin-top: 6px;
+}
+
+.iconContainer{
+    height: 68px;
+    width: 100%;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+.iconContainer a:hover {
+    text-decoration: none;
+}
+
+.icon{
+    height: 100%;
+    width: auto;
+    display: inline-block;
+}
+
+.information {
+    margin:12px;
 }
