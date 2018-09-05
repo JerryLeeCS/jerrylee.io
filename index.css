@@ -53,8 +53,10 @@
     height: 100%;
     width: auto;
     display: inline-block;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
-.information {
+.information, .frameworks{
     margin:12px;
 }
