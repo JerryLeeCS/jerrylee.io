@@ -1,3 +1,14 @@
+#body {
+  background: #343d46;
+  height: 100%;
+}
+
+#container {
+  max-width: 480px;
+  height: 480px;
+  text-align: center;
+}
+
 .heading {
     font-size: 28px;
 }
@@ -20,7 +31,7 @@
 }
 
 .links{
-    background: lightsalmon;
+    background: #343d46;
     color: white;
 }
 
