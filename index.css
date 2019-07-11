@@ -71,3 +71,41 @@
 .information, .frameworks{
     margin:12px;
 }
+
+#heart {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+#heart:after {
+  	content: '\f004';
+		font: 18px 'FontAwesome', sans-serif;
+    color: crimson;
+		transform: translate(-50%, 50%);
+    animation: heartbeat 1s infinite;
+    cursor: pointer;
+}
+
+#heart:hover:after {
+  animation: heartbeat 0.5s infinite;
+}
+
+@keyframes heartbeat {
+	0% {
+		font-size: 18px;
+	}
+	30% {
+		font-size: 20px;
+	}
+	45% {
+		font-size: 22px;
+	}
+	70% {
+		font-size: 20px;
+	}
+	100% {
+		font-size: 18px;
+	}
+}
