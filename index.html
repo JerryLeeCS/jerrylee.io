@@ -31,12 +31,13 @@
 
       let camera, scene, renderer
       let mesh
-      const amount = 5
+      const amount = 10
       const meshCount = Math.pow(amount, 3)
       const transform = new THREE.Object3D()
       let scalingUp = true
       const maximumScale = 1.2
       let currentScale = 1
+      let baseScale = 1
 
       init()
       animate()
@@ -49,8 +50,8 @@
           10000
         )
 
-        camera.position.set(amount * 0.9, amount * 0.9, amount * 0.9)
-        camera.lookAt(0, 0, 0)
+        camera.position.set(amount * 1.7, -amount / 2, amount * 1.7)
+        camera.lookAt(0, -amount / 2, 0)
 
         scene = new THREE.Scene()
         scene.background = new THREE.Color(0xffffff)
@@ -93,13 +94,21 @@
 
         if (scalingUp) {
           currentScale += 0.01
-          mesh.scale.set(currentScale, currentScale, currentScale)
+          mesh.scale.set(
+            currentScale * baseScale,
+            currentScale * baseScale,
+            currentScale * baseScale
+          )
           if (currentScale >= maximumScale) {
             scalingUp = false
           }
         } else {
           currentScale -= 0.01
-          mesh.scale.set(currentScale, currentScale, currentScale)
+          mesh.scale.set(
+            currentScale * baseScale,
+            currentScale * baseScale,
+            currentScale * baseScale
+          )
           if (currentScale <= 1) {
             scalingUp = true
           }
