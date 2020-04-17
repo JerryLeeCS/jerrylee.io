@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>three.js webgl - simple text from json</title>
+    <title>jerrylee.io</title>
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -13,17 +13,50 @@
       body {
         margin: 0;
         height: 100%;
+        font-family: "Lucida Console", Courier, monospace;
       }
       #c {
+        position: absolute;
         width: 100%;
         height: 100%;
         display: block;
+      }
+
+      #body-layout {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      #main-layout {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      #center-container {
+        position: absolute;
+        top: 70%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
     </style>
   </head>
 
   <body>
     <canvas id="c"></canvas>
+    <div id="body-layout">
+      <div id="main-layout">
+        <div id="center-container">
+          <h1>
+            Hi, I am Jerry.
+          </h1>
+          <h2>
+            A software engineer based in Los Angeles.
+          </h2>
+        </div>
+      </div>
+    </div>
     <script type="module">
       import * as THREE from "./js/three.module.js"
 
@@ -37,7 +70,7 @@
       let scalingUp = true
       const maximumScale = 1.2
       let currentScale = 1
-      let baseScale = 1
+      let positionMultipler = 1
 
       init()
       animate()
@@ -92,35 +125,32 @@
         mesh.rotation.x = Math.sin(time / 4)
         mesh.rotation.y = Math.sin(time / 2)
 
+        //Heartbeat effect
         if (scalingUp) {
-          currentScale += 0.01
-          mesh.scale.set(
-            currentScale * baseScale,
-            currentScale * baseScale,
-            currentScale * baseScale
-          )
+          currentScale += 0.035
+          mesh.scale.set(currentScale, currentScale, currentScale)
           if (currentScale >= maximumScale) {
             scalingUp = false
           }
         } else {
           currentScale -= 0.01
-          mesh.scale.set(
-            currentScale * baseScale,
-            currentScale * baseScale,
-            currentScale * baseScale
-          )
+          mesh.scale.set(currentScale, currentScale, currentScale)
           if (currentScale <= 1) {
             scalingUp = true
           }
         }
 
+        //Cube formation
         let i = 0
         let offset = (amount - 1) / 2
-
         for (let x = 0; x < amount; x++) {
           for (let y = 0; y < amount; y++) {
             for (let z = 0; z < amount; z++) {
-              transform.position.set(offset - x, offset - y, offset - z)
+              transform.position.set(
+                (offset - x) * positionMultipler,
+                (offset - y) * positionMultipler,
+                (offset - z) * positionMultipler
+              )
 
               transform.updateMatrix()
               mesh.setMatrixAt(i++, transform.matrix)
