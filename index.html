@@ -1,162 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <title>three.js webgl - simple text from json</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css">
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <link type="text/css" rel="stylesheet" href="main.css" />
     <style>
-        body {
-            background-color: #f0f0f0;
-            color: #444;
-        }
-
-        a {
-            color: #08f;
-        }
-
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <canvas id="c"></canvas>
     <script type="module">
+      import * as THREE from "./js/three.module.js"
 
-        import * as THREE from './js/three.module.js';
+      import { OrbitControls } from "./js/OrbitControls.js"
 
-			import { OrbitControls } from './js/OrbitControls.js';
+      let camera, scene, renderer
+      let mesh
+      const amount = 5
+      const meshCount = Math.pow(amount, 3)
+      const transform = new THREE.Object3D()
+      let scalingUp = true
+      const maximumScale = 1.2
+      let currentScale = 1
 
-			var camera, scene, renderer;
+      init()
+      animate()
 
-			init();
-			animate();
+      function init() {
+        camera = new THREE.PerspectiveCamera(
+          70,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          10000
+        )
 
-			function init( ) {
+        camera.position.set(amount * 0.9, amount * 0.9, amount * 0.9)
+        camera.lookAt(0, 0, 0)
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, - 400, 600 );
+        scene = new THREE.Scene()
+        scene.background = new THREE.Color(0xffffff)
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
+        const color = 0x111111
+        const geometry = new THREE.BoxBufferGeometry(0.2, 0.2, 0.2)
+        const material = new THREE.MeshLambertMaterial({
+          color,
+        })
 
-				var loader = new THREE.FontLoader();
-				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+        mesh = new THREE.InstancedMesh(geometry, material, meshCount)
+        mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage) // will be updated every frame
 
-					var xMid, text;
+        scene.add(mesh)
 
-					var color = 0xFF2D00;
+        scene.add(new THREE.AmbientLight(0x111111))
 
-					var matDark = new THREE.LineBasicMaterial( {
-						color: color,
-						side: THREE.DoubleSide
-					} );
+        const canvas = document.querySelector("#c")
+        renderer = new THREE.WebGLRenderer({ canvas })
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.setSize(window.innerWidth, window.innerHeight)
 
-					var matLite = new THREE.MeshBasicMaterial( {
-						color: color,
-						transparent: true,
-						opacity: 0.4,
-						side: THREE.DoubleSide
-					} );
+        window.addEventListener("resize", onWindowResize, false)
+      } // end init
 
-					var message = "   jerrylee.io\nComing Soon.";
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
 
-					var shapes = font.generateShapes( message, 100 );
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      }
 
-					var geometry = new THREE.ShapeBufferGeometry( shapes );
+      function animate() {
+        requestAnimationFrame(animate)
 
-					geometry.computeBoundingBox();
+        var time = Date.now() * 0.001
 
-					xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+        mesh.rotation.x = Math.sin(time / 4)
+        mesh.rotation.y = Math.sin(time / 2)
 
-					geometry.translate( xMid, 0, 0 );
+        if (scalingUp) {
+          currentScale += 0.01
+          mesh.scale.set(currentScale, currentScale, currentScale)
+          if (currentScale >= maximumScale) {
+            scalingUp = false
+          }
+        } else {
+          currentScale -= 0.01
+          mesh.scale.set(currentScale, currentScale, currentScale)
+          if (currentScale <= 1) {
+            scalingUp = true
+          }
+        }
 
-					// make shape ( N.B. edge view not visible )
+        let i = 0
+        let offset = (amount - 1) / 2
 
-					text = new THREE.Mesh( geometry, matLite );
-					text.position.z = - 150;
-					scene.add( text );
+        for (let x = 0; x < amount; x++) {
+          for (let y = 0; y < amount; y++) {
+            for (let z = 0; z < amount; z++) {
+              transform.position.set(offset - x, offset - y, offset - z)
 
-					// make line shape ( N.B. edge view remains visible )
+              transform.updateMatrix()
+              mesh.setMatrixAt(i++, transform.matrix)
+            }
+          }
+        }
 
-					var holeShapes = [];
+        mesh.instanceMatrix.needsUpdate = true
 
-					for ( var i = 0; i < shapes.length; i ++ ) {
+        render()
+      }
 
-						var shape = shapes[ i ];
-
-						if ( shape.holes && shape.holes.length > 0 ) {
-
-							for ( var j = 0; j < shape.holes.length; j ++ ) {
-
-								var hole = shape.holes[ j ];
-								holeShapes.push( hole );
-
-							}
-
-						}
-
-					}
-
-					shapes.push.apply( shapes, holeShapes );
-
-					var lineText = new THREE.Object3D();
-
-					for ( var i = 0; i < shapes.length; i ++ ) {
-
-						var shape = shapes[ i ];
-
-						var points = shape.getPoints();
-						var geometry = new THREE.BufferGeometry().setFromPoints( points );
-
-						geometry.translate( xMid, 0, 0 );
-
-						var lineMesh = new THREE.Line( geometry, matDark );
-						lineText.add( lineMesh );
-
-					}
-
-					scene.add( lineText );
-
-				} ); //end load function
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			} // end init
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
-
-				renderer.render( scene, camera );
-
-			}
-
-		</script>
-
-</body>
-
+      function render() {
+        renderer.render(scene, camera)
+      }
+    </script>
+  </body>
 </html>
