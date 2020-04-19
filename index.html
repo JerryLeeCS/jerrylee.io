@@ -13,7 +13,7 @@
       body {
         margin: 0;
         height: 100%;
-        font-family: "Lucida Console", Courier, monospace;
+        font-family: "sans-serif", Courier, monospace;
       }
       #c {
         position: absolute;
@@ -39,6 +39,7 @@
         top: 70%;
         left: 50%;
         transform: translate(-50%, -50%);
+        background-color: white;
       }
     </style>
   </head>
@@ -70,7 +71,9 @@
       let scalingUp = true
       const maximumScale = 1.2
       let currentScale = 1
-      let positionMultipler = 1
+      let cubeDistanceMultipler = 1
+      const cubeDistanceMax = 12
+      const cubeDistanceIncrement = 0.2
 
       init()
       animate()
@@ -137,6 +140,10 @@
           mesh.scale.set(currentScale, currentScale, currentScale)
           if (currentScale <= 1) {
             scalingUp = true
+            if (cubeDistanceMultipler < cubeDistanceMax) {
+              cubeDistanceMultipler += cubeDistanceIncrement
+              console.log("cubeDistanceMultipler ", cubeDistanceMultipler)
+            }
           }
         }
 
@@ -147,9 +154,9 @@
           for (let y = 0; y < amount; y++) {
             for (let z = 0; z < amount; z++) {
               transform.position.set(
-                (offset - x) * positionMultipler,
-                (offset - y) * positionMultipler,
-                (offset - z) * positionMultipler
+                (offset - x) * cubeDistanceMultipler,
+                (offset - y) * cubeDistanceMultipler,
+                (offset - z) * cubeDistanceMultipler
               )
 
               transform.updateMatrix()
