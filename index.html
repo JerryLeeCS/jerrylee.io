@@ -39,7 +39,7 @@
         top: 70%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: white;
+        background: rgb(255 249 249 / 69%);
       }
     </style>
   </head>
@@ -50,10 +50,10 @@
       <div id="main-layout">
         <div id="center-container">
           <h1>
-            Hi, I am Jerry.
+            Hi, my name is Jerry.
           </h1>
           <h2>
-            A software engineer based in Los Angeles.
+            I am a software engineer based in Los Angeles,CA specializing in building exceptional web apps.
           </h2>
         </div>
       </div>
@@ -65,15 +65,12 @@
 
       let camera, scene, renderer
       let mesh
-      const amount = 10
+      const amount = 7
       const meshCount = Math.pow(amount, 3)
-      const transform = new THREE.Object3D()
-      let scalingUp = true
-      const maximumScale = 1.2
-      let currentScale = 1
-      let cubeDistanceMultipler = 1
-      const cubeDistanceMax = 12
-      const cubeDistanceIncrement = 0.2
+      const object3D = new THREE.Object3D()
+      let cubeDistanceMultipler = 12
+      const positions = []
+      let targetIndices = Array(meshCount).fill(1).map((v,i) => i).sort(() => Math.random() - 0.5)
 
       init()
       animate()
@@ -92,14 +89,36 @@
         scene = new THREE.Scene()
         scene.background = new THREE.Color(0xffffff)
 
-        const color = 0x111111
-        const geometry = new THREE.BoxBufferGeometry(0.2, 0.2, 0.2)
-        const material = new THREE.MeshLambertMaterial({
-          color,
-        })
+        const color = 0x111111	
+        const geometry = new THREE.SphereBufferGeometry(0.2, 0.2, 0.2)
+        const material = new THREE.MeshMatcapMaterial({color})
 
         mesh = new THREE.InstancedMesh(geometry, material, meshCount)
         mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage) // will be updated every frame
+
+        //Cube formation
+        let i = 0
+        let offset = (amount - 1) / 2
+        for (let x = 0; x < amount; x++) {
+          for (let y = 0; y < amount; y++) {
+            for (let z = 0; z < amount; z++) {
+              const position = [
+              (offset - x) * cubeDistanceMultipler * Math.random(),
+                (offset - y) * cubeDistanceMultipler * Math.random(),
+                (offset - z) * cubeDistanceMultipler * Math.random() 
+              ]
+              object3D.position.set(
+                ...position
+              )
+
+              object3D.updateMatrix()
+              mesh.setMatrixAt(i++, object3D.matrix)
+
+              positions.push(position)
+            }
+          }
+        }
+
 
         scene.add(mesh)
 
@@ -128,40 +147,27 @@
         mesh.rotation.x = Math.sin(time / 4)
         mesh.rotation.y = Math.sin(time / 2)
 
-        //Heartbeat effect
-        if (scalingUp) {
-          currentScale += 0.035
-          mesh.scale.set(currentScale, currentScale, currentScale)
-          if (currentScale >= maximumScale) {
-            scalingUp = false
-          }
-        } else {
-          currentScale -= 0.01
-          mesh.scale.set(currentScale, currentScale, currentScale)
-          if (currentScale <= 1) {
-            scalingUp = true
-            if (cubeDistanceMultipler < cubeDistanceMax) {
-              cubeDistanceMultipler += cubeDistanceIncrement
-            }
-          }
-        }
+        let tempMatrix = new THREE.Matrix4();
 
-        //Cube formation
-        let i = 0
-        let offset = (amount - 1) / 2
-        for (let x = 0; x < amount; x++) {
-          for (let y = 0; y < amount; y++) {
-            for (let z = 0; z < amount; z++) {
-              transform.position.set(
-                (offset - x) * cubeDistanceMultipler,
-                (offset - y) * cubeDistanceMultipler,
-                (offset - z) * cubeDistanceMultipler
-              )
+        for (let i = 0; i < meshCount; i++){
+          let targetIndex = targetIndices[i];
+          const targetPosition = positions[targetIndex];
+          const currentPosition = positions[i];
 
-              transform.updateMatrix()
-              mesh.setMatrixAt(i++, transform.matrix)
-            }
-          }
+          const positionDifferences = targetPosition.map((targetPosition, i) => targetPosition - currentPosition[i])
+
+          const newPosition = positionDifferences.map((positionDifference, i) => {
+            let factor = 0.05
+            return currentPosition[i] + (positionDifference * factor)
+          })
+          
+          object3D.position.set(
+            ...newPosition
+          )
+
+          object3D.updateMatrix()
+          mesh.setMatrixAt(i, object3D.matrix);
+          positions[i] = newPosition
         }
 
         mesh.instanceMatrix.needsUpdate = true
