@@ -49,11 +49,10 @@
     <div id="body-layout">
       <div id="main-layout">
         <div id="center-container">
-          <h1>
-            Hi, my name is Jerry.
-          </h1>
+          <h1>Hi, my name is Jerry.</h1>
           <h2>
-            I am a software engineer based in Los Angeles,CA specializing in building exceptional web apps.
+            I am a software engineer based in Los Angeles,CA specializing in
+            building exceptional web apps.
           </h2>
         </div>
       </div>
@@ -63,17 +62,25 @@
 
       import { OrbitControls } from "./js/OrbitControls.js"
 
+      import Vec3 from "./js/Vec3.js"
+
       let camera, scene, renderer
       let mesh
       const amount = 7
+      const maxVelocity = 2
+      const maxForce = 0.5
+      var start = undefined
       const meshCount = Math.pow(amount, 3)
       const object3D = new THREE.Object3D()
       let cubeDistanceMultipler = 12
-      const positions = []
-      let targetIndices = Array(meshCount).fill(1).map((v,i) => i).sort(() => Math.random() - 0.5)
+      const dots = []
+      let targetIndices = Array(meshCount)
+        .fill(1)
+        .map((v, i) => i)
+        .sort(() => Math.random() - 0.5)
 
       init()
-      animate()
+      animate(0)
 
       function init() {
         camera = new THREE.PerspectiveCamera(
@@ -83,15 +90,15 @@
           10000
         )
 
-        camera.position.set(amount * 1.7, -amount / 2, amount * 1.7)
+        camera.position.set(amount * 5, -amount / 2, amount * 5)
         camera.lookAt(0, -amount / 2, 0)
 
         scene = new THREE.Scene()
         scene.background = new THREE.Color(0xffffff)
 
-        const color = 0x111111	
-        const geometry = new THREE.SphereBufferGeometry(0.2, 0.2, 0.2)
-        const material = new THREE.MeshMatcapMaterial({color})
+        const color = 0x111111
+        const geometry = new THREE.SphereBufferGeometry(0.3, 0.3, 0.3)
+        const material = new THREE.MeshMatcapMaterial({ color })
 
         mesh = new THREE.InstancedMesh(geometry, material, meshCount)
         mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage) // will be updated every frame
@@ -102,23 +109,28 @@
         for (let x = 0; x < amount; x++) {
           for (let y = 0; y < amount; y++) {
             for (let z = 0; z < amount; z++) {
-              const position = [
-              (offset - x) * cubeDistanceMultipler * Math.random(),
-                (offset - y) * cubeDistanceMultipler * Math.random(),
-                (offset - z) * cubeDistanceMultipler * Math.random() 
-              ]
-              object3D.position.set(
-                ...position
+              const position = new Vec3(
+                ...[x, y, z].map(
+                  (v) => (offset - v) * cubeDistanceMultipler * Math.random()
+                )
               )
+              const velocity = new Vec3(
+                Math.random() * 3,
+                Math.random() * 3,
+                Math.random() * 3
+              )
+              object3D.position.set(...position.getAttributes())
 
               object3D.updateMatrix()
               mesh.setMatrixAt(i++, object3D.matrix)
 
-              positions.push(position)
+              dots.push({
+                position,
+                velocity,
+              })
             }
           }
         }
-
 
         scene.add(mesh)
 
@@ -139,7 +151,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight)
       }
 
-      function animate() {
+      function animate(timestamp) {
         requestAnimationFrame(animate)
 
         var time = Date.now() * 0.001
@@ -147,27 +159,33 @@
         mesh.rotation.x = Math.sin(time / 4)
         mesh.rotation.y = Math.sin(time / 2)
 
-        let tempMatrix = new THREE.Matrix4();
+        let tempMatrix = new THREE.Matrix4()
 
-        for (let i = 0; i < meshCount; i++){
-          let targetIndex = targetIndices[i];
-          const targetPosition = positions[targetIndex];
-          const currentPosition = positions[i];
+        for (let i = 0; i < meshCount; i++) {
+          const targetIndex = targetIndices[i]
+          const targetPosition = dots[targetIndex].position.clone()
+          const currentDot = dots[i]
 
-          const positionDifferences = targetPosition.map((targetPosition, i) => targetPosition - currentPosition[i])
+          const desiredVelocity = targetPosition
+            .subtract(currentDot.position)
+            .normalize()
+            .scale(maxVelocity)
 
-          const newPosition = positionDifferences.map((positionDifference, i) => {
-            let factor = 0.05
-            return currentPosition[i] + (positionDifference * factor)
-          })
-          
-          object3D.position.set(
-            ...newPosition
-          )
+          const steering = desiredVelocity
+            .subtract(currentDot.velocity)
+            .truncate(maxForce)
 
+          currentDot.velocity.add(steering).truncate(maxVelocity)
+          dots[i] = currentDot
+        }
+
+        for (let i = 0; i < meshCount; i++) {
+          const currentDot = dots[i]
+          currentDot.position.add(currentDot.velocity)
+          object3D.position.set(...currentDot.position.getAttributes())
           object3D.updateMatrix()
-          mesh.setMatrixAt(i, object3D.matrix);
-          positions[i] = newPosition
+          mesh.setMatrixAt(i, object3D.matrix)
+          dots[i] = currentDot
         }
 
         mesh.instanceMatrix.needsUpdate = true
