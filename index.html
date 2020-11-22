@@ -66,9 +66,9 @@
 
       let camera, scene, renderer
       let mesh
-      const amount = 7
-      const maxVelocity = 2
-      const maxForce = 0.5
+      const amount = 14
+      const maxVelocity = 1.5
+      const maxForce = 0.3
       var start = undefined
       const meshCount = Math.pow(amount, 3)
       const object3D = new THREE.Object3D()
@@ -90,14 +90,18 @@
           10000
         )
 
-        camera.position.set(amount * 5, -amount / 2, amount * 5)
-        camera.lookAt(0, -amount / 2, 0)
+        camera.position.set(
+          (amount * cubeDistanceMultipler) / 2,
+          (amount * cubeDistanceMultipler) / 2,
+          (amount * cubeDistanceMultipler) / 2
+        )
+        camera.lookAt(0, 0, 0)
 
         scene = new THREE.Scene()
         scene.background = new THREE.Color(0xffffff)
 
         const color = 0x111111
-        const geometry = new THREE.SphereBufferGeometry(0.3, 0.3, 0.3)
+        const geometry = new THREE.SphereBufferGeometry(1, 0.3, 0.3)
         const material = new THREE.MeshMatcapMaterial({ color })
 
         mesh = new THREE.InstancedMesh(geometry, material, meshCount)
@@ -110,9 +114,7 @@
           for (let y = 0; y < amount; y++) {
             for (let z = 0; z < amount; z++) {
               const position = new Vec3(
-                ...[x, y, z].map(
-                  (v) => (offset - v) * cubeDistanceMultipler * Math.random()
-                )
+                ...[x, y, z].map((v) => (offset - v) * cubeDistanceMultipler)
               )
               const velocity = new Vec3(
                 Math.random() * 3,
@@ -160,32 +162,56 @@
         mesh.rotation.y = Math.sin(time / 2)
 
         let tempMatrix = new THREE.Matrix4()
+        if (timestamp === 0 || timestamp > 200) {
+          for (let i = 0; i < meshCount; i++) {
+            const targetIndex = targetIndices[i]
+            const targetPosition = dots[targetIndex].position.clone()
+            const currentDot = dots[i]
 
-        for (let i = 0; i < meshCount; i++) {
-          const targetIndex = targetIndices[i]
-          const targetPosition = dots[targetIndex].position.clone()
-          const currentDot = dots[i]
+            const desiredVelocity = targetPosition
+              .subtract(currentDot.position)
+              .normalize()
+              .scale(maxVelocity)
 
-          const desiredVelocity = targetPosition
-            .subtract(currentDot.position)
-            .normalize()
-            .scale(maxVelocity)
+            const steering = desiredVelocity
+              .subtract(currentDot.velocity)
+              .truncate(maxForce)
 
-          const steering = desiredVelocity
-            .subtract(currentDot.velocity)
-            .truncate(maxForce)
+            currentDot.velocity.add(steering).truncate(maxVelocity)
+            dots[i] = currentDot
+          }
 
-          currentDot.velocity.add(steering).truncate(maxVelocity)
-          dots[i] = currentDot
-        }
+          for (let i = 0; i < meshCount; i++) {
+            const currentDot = dots[i]
 
-        for (let i = 0; i < meshCount; i++) {
-          const currentDot = dots[i]
-          currentDot.position.add(currentDot.velocity)
-          object3D.position.set(...currentDot.position.getAttributes())
-          object3D.updateMatrix()
-          mesh.setMatrixAt(i, object3D.matrix)
-          dots[i] = currentDot
+            const boundary = cubeDistanceMultipler * amount
+            if (
+              currentDot.position.x + currentDot.velocity.x >= boundary ||
+              currentDot.position.x + currentDot.velocity.x <= -boundary
+            ) {
+              currentDot.velocity.x = -currentDot.velocity.x
+            }
+
+            if (
+              currentDot.position.y + currentDot.velocity.y >= boundary ||
+              currentDot.position.y + currentDot.velocity.y <= -boundary
+            ) {
+              currentDot.velocity.y = -currentDot.velocity.y
+            }
+
+            if (
+              currentDot.position.z + currentDot.velocity.z >= boundary ||
+              currentDot.position.z + currentDot.velocity.z <= -boundary
+            ) {
+              currentDot.velocity.z = -currentDot.velocity.z
+            }
+
+            currentDot.position.add(currentDot.velocity)
+            object3D.position.set(...currentDot.position.getAttributes())
+            object3D.updateMatrix()
+            mesh.setMatrixAt(i, object3D.matrix)
+            dots[i] = currentDot
+          }
         }
 
         mesh.instanceMatrix.needsUpdate = true
