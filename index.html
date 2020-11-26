@@ -7,85 +7,37 @@
       name="viewport"
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
-    <link type="text/css" rel="stylesheet" href="main.css" />
-    <style>
-      html,
-      body {
-        margin: 0;
-        height: 100%;
-        font-family: "sans-serif", Courier, monospace;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .canvas-container {
-        flex: 3;
-        overflow: hidden;
-        border: 1px solid black;
-      }
-
-      #c {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-
-      #body-layout {
-        flex: 1;
-      }
-
-      .info-container {
-        flex: 1;
-        padding: 12px;
-      }
-
-      .info-container a {
-        text-decoration: none;
-      }
-
-      .info-container img {
-        height: 1.5rem;
-      }
-    </style>
+    <link rel="stylesheet" href="./css/index.css" href="./css//index.css" />
   </head>
 
   <body>
-    <div id="body-layout">
+    <div id="foregound">
       <div class="info-container">
-        <p>Hi, my name is Jerry.</p>
-        <p>
-          I am a software engineer based in Los Angeles, CA specializing in
-          frontend development.
-        </p>
-        <p>
-          I have worked on
-          <a
-            href="https://www.beyond.ai/products/refinery-operations-advisor/"
-            target="_blank"
-            >Refinery Operations Advisor</a
-          >
-          from Beyond Limits, and DoubleDoor's
-          <a href="https://www.doubledoor.io/" target="_blank"
-            >real estate platform</a
-          >.
-        </p>
-        <p>
-          <a href="https://www.linkedin.com/in/jerry-lee-dev/" target="_blank">
-            <img src="./img/linkedin.png" />
-          </a>
-          <a href="https://github.com/JerryLeeCS" target="_blank">
-            <img src="./img/github.png" />
-          </a>
-        </p>
+        <div class="info">
+          <p>Hi, my name is Jerry.</p>
+          <p>
+            I am a software engineer based in Los Angeles, CA specializing in
+            frontend development.
+          </p>
+          <p>
+            <a
+              href="https://www.linkedin.com/in/jerry-lee-dev/"
+              target="_blank"
+            >
+              <img src="./img/linkedin.png" />
+            </a>
+            <a href="https://github.com/JerryLeeCS" target="_blank">
+              <img src="./img/github.png" />
+            </a>
+          </p>
+        </div>
       </div>
     </div>
-    <div class="canvas-container">
-      <canvas id="c"></canvas>
-    </div>
+    <div class="canvas-container"></div>
     <script type="module">
-      import backgroundAnimation from "./js/background-animation.js"
+      import BackgroundAnimation from "./js/BackgroundAnimation.js"
 
-      backgroundAnimation(window, document)
+      BackgroundAnimation(window, document)
     </script>
   </body>
 </html>
