@@ -41,6 +41,12 @@ body {
   height: 1.5rem;
 }
 
+.reference {
+  position: absolute;
+  bottom: 0%;
+  right: 1rem;
+}
+
 @media screen and (max-width: 600px) {
   .info {
     width: 80%;
