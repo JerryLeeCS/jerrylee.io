@@ -6,7 +6,7 @@ import ProjectCard from "./components/home/ProjectCard";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-12 sm:p-24 bg-neutral-800 text-neutral-100">
+    <main className="flex min-h-screen flex-col items-center justify-between p-6 sm:p-24 bg-neutral-800 text-neutral-100">
       <div className="z-10 w-full max-w-5xl font-mono text-sm">
         <h1 className="text-3xl mb-4">Jerry Lee</h1>
         <div className="flex gap-6 mb-4">
