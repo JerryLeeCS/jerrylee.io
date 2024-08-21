@@ -13,8 +13,11 @@ export default function Home() {
           <IconBulletText icon={<Location />} text="Los Angeles, CA" />
           <IconBulletText icon={<User />} text="Software Engineer" />
         </div>
-        <div className="mb-16">
+        <div className="mb-12">
           <span>Building products to make people&apos;s life better.</span>
+        </div>
+        <div className="mb-4">
+          <span>Here are the products I worked on...</span>
         </div>
         <div className="flex flex-col gap-4">
           {projects.map((project) => (
