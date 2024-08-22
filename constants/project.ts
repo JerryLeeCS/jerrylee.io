@@ -16,7 +16,7 @@ export const projects: Project[] = [
       "PostgreSQL",
       "Redis",
     ],
-    startDate: new Date("2021-07-01"),
+    startDate: new Date("2024-07-01"),
   },
   {
     title: "🚘 Motional - Self-driving Car Data Analytic Platform",
@@ -49,7 +49,7 @@ export const projects: Project[] = [
       "Go",
       "PostgreSQL",
     ],
-    startDate: new Date("2021-10-01"),
+    startDate: new Date("2019-10-01"),
     endDate: new Date("2021-06-01"),
   },
   {
