@@ -2,6 +2,14 @@ import { Project } from "app/types/project";
 
 export const projects: Project[] = [
   {
+    title: "🏗️ Verkada - Business System",
+    description:
+      "Help Verkada to build a business system, including Finance, Legal, Operation, People, Supply Chain",
+    link: "https://www.verkada.com/",
+    tags: ["React", "TypeScript", "Python", "Golang", "AWS"],
+    startDate: new Date("2025-12-01"),
+  },
+  {
     title: "📝 Emoji Journal",
     description:
       "Make journal easier to look back on by using emojis to represent your mood.",
@@ -17,6 +25,7 @@ export const projects: Project[] = [
       "Redis",
     ],
     startDate: new Date("2024-07-01"),
+    endDate: new Date("2025-12-01"),
   },
   {
     title: "🚘 Motional - Self-driving Car Data Analytic Platform",
