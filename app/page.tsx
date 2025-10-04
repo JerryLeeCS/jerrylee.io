@@ -14,7 +14,7 @@ export default function Home() {
           <IconBulletText icon={<User />} text="Software Engineer" />
         </div>
         <div className="mb-12">
-          <span>Building products to make people&apos;s life better.</span>
+          <span>Building products to make businesses better.</span>
         </div>
         <div className="mb-4">
           <span>Here are the products I worked on...</span>
