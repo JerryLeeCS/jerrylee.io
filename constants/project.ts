@@ -48,7 +48,7 @@ export const projects: Project[] = [
       "🛢️ Beyond Limits - Oil Refinery Optimization & Oil Drilling Monitoring",
     description:
       "Improve oil refinery efficiency and monitoring oil drilling operations by giving insights and suggestions.",
-    link: "https://www.beyondlimits.ai/",
+    link: "https://www.beyond.ai/",
     tags: [
       "React",
       "TypeScript",
