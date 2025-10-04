@@ -10,7 +10,7 @@ export default function Home() {
       <div className="z-10 w-full max-w-5xl font-mono text-sm">
         <h1 className="text-3xl mb-4">Jerry Lee</h1>
         <div className="flex gap-6 mb-4">
-          <IconBulletText icon={<Location />} text="Los Angeles, CA" />
+          <IconBulletText icon={<Location />} text="San Francisco, CA" />
           <IconBulletText icon={<User />} text="Software Engineer" />
         </div>
         <div className="mb-12">
